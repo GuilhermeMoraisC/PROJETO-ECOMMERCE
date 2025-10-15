@@ -1,0 +1,24 @@
+/* Adicione este código ao final do arquivo src/pages/HomePage.css */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.whatsapp-button {
+  background-color: #25D366; /* Cor do WhatsApp */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.whatsapp-button:hover {
+  background-color: #128C7E;
+}

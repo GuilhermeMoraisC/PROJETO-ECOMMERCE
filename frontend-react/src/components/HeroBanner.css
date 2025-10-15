@@ -1,0 +1,99 @@
+/* Arquivo: src/components/HeroBanner.css */
+
+.hero-banner {
+  background-color: #3d3dcb; /* Um azul similar ao do exemplo */
+  color: white;
+  padding: 60px 0;
+  width: 100%;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas menores */
+}
+
+/* Lado do Texto */
+.hero-text {
+  flex: 1; /* Ocupa metade do espaço disponível */
+  min-width: 300px; /* Largura mínima antes de quebrar a linha */
+}
+
+.hero-text h2 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.hero-cta {
+  background-color: #5cb85c; /* Verde para o botão */
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.hero-cta:hover {
+  background-color: #4cae4c;
+}
+
+/* Lado das Imagens */
+.hero-image-container {
+  flex: 1;
+  position: relative; /* Essencial para posicionar as imagens flutuantes */
+  min-width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-main-image {
+  max-width: 80%;
+  height: auto;
+  z-index: 2; /* Fica na frente das flutuantes que estiverem atrás */
+}
+
+.floating-product {
+  position: absolute; /* Posição absoluta em relação ao container pai (.hero-image-container) */
+  width: 100px; /* Tamanho das imagens menores */
+  animation: float 4s ease-in-out infinite; /* Animação de flutuação */
+  z-index: 1;
+}
+
+/* Posição de cada produto flutuante */
+.product-1 {
+  top: 0;
+  left: 10%;
+}
+
+.product-2 {
+  bottom: 10%;
+  left: 0;
+  animation-delay: 1s; /* Começa a animação com atraso */
+}
+
+.product-3 {
+  top: 20%;
+  right: 0;
+  animation-delay: 2s;
+}
+
+/* Animação de flutuação */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}

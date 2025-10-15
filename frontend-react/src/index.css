@@ -1,0 +1,30 @@
+/* Arquivo: src/index.css */
+
+/* Definindo variáveis de cores para usar no site todo (inspirado no Utimix) */
+:root {
+  --cor-primaria: #ff6600; /* Laranja/vermelho principal */
+  --texto-escuro: #333;
+  --texto-claro: #666;
+  --fundo-site: #f4f4f4;
+  --branco: #ffffff;
+  --borda-suave: #e0e0e0;
+}
+
+/* Reset básico e definição da fonte principal */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--fundo-site);
+  color: var(--texto-escuro);
+}
+
+/* Classe "container" para centralizar o conteúdo principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto; /* Centraliza o container na página */
+  padding: 20px;
+}

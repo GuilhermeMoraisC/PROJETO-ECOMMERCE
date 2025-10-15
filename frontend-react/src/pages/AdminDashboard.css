@@ -1,0 +1,22 @@
+/* Adicione ao final de src/pages/AdminDashboard.css */
+
+.divider {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 40px 0;
+}
+
+.instructions {
+  font-size: 0.9rem;
+  color: #555;
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  border-left: 3px solid var(--cor-primaria);
+}
+
+.instructions code {
+  background-color: #e0e0e0;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
