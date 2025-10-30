@@ -32,7 +32,7 @@ function AdminDashboard() {
 
     // 2. Enviar para o script PHP de upload
     try {
-      const response = await fetch('http://localhost/projeto-fornecedor/backend-php/api/admin/upload-produto.php', {
+      const response = await fetch('http://localhost/backend-php/api/admin/upload-produto.php', {
         method: 'POST',
         body: formData,
         // Não defina 'Content-Type' aqui, o 'fetch' faz isso
@@ -75,7 +75,7 @@ function AdminDashboard() {
 
     // 2. Enviar para o script PHP de importação
     try {
-      const response = await fetch('http://localhost/projeto-fornecedor/backend-php/api/admin/importar-csv.php', {
+      const response = await fetch('http://localhost/backend-php/api/admin/importar-csv.php', {
         method: 'POST',
         body: formData,
       });
