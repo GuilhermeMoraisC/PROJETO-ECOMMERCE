@@ -14,7 +14,7 @@ import produto5 from './images//produto5.jpg';
 function HeroBanner() {
   // Array com as imagens do carrossel
   const imagens = [produto1, produto2, produto3, produto4, produto5];
-<img src={produto1 }/>
+
   // Configurações do carrossel
   const settings = {
     dots: true,

@@ -1,5 +1,78 @@
-/* Adicione ao final de src/pages/AdminDashboard.css */
+/* Arquivo: src/pages/AdminDashboard.css */
 
+/* Estilos gerais para o formulário (adicione se necessário) */
+.admin-dashboard {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Garante que o padding não afete a largura */
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.btn-submit {
+  background-color: var(--cor-primaria); /* Usa a cor primária definida no seu CSS global */
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+  background-color: #e65c00; /* Tom mais escuro */
+}
+
+.feedback-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  background-color: #f0f0f0;
+  border-left: 4px solid #ccc;
+}
+/* Estiliza mensagens de sucesso (você pode melhorar isso no JS) */
+.feedback-message:before {
+  content: 'Status: ';
+  font-weight: normal;
+}
+
+
+/* --- Estilos que você já tinha --- */
 .divider {
   border: none;
   border-top: 1px solid #ccc;

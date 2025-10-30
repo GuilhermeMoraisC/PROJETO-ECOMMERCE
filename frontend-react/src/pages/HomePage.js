@@ -11,7 +11,7 @@ function HomePage() {
     const numeroFornecedor = "5511999998888"; // Coleque seu número aqui
 
     useEffect(() => {
-        fetch('http://localhost/backend-php/api/get-produtos.php')
+        fetch('http://localhost/projeto-fornecedor/backend-php/api/get-produtos.php')
             .then(response => response.json())
             .then(data => setProducts(data))
             .catch(error => console.error("Erro ao buscar produtos:", error));
