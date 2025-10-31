@@ -21,3 +21,53 @@
   color: var(--cor-primaria);
   margin: 0;
 }
+
+/* Arquivo: src/components/Header.css */
+
+/* Define o tamanho exato do logo */
+.logo-img {
+  width: 25px; 
+  height: 25px;
+  object-fit: contain; /* Garante que a imagem se encaixe sem distorcer, se necessário */
+}
+
+/* Arquivo: src/components/Header.css */
+
+/* 1. Alinha a logo e o texto no centro */
+.logo-container {
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  gap: 8px; /* Espaço entre a imagem e o texto */
+}
+
+/* 2. Mantém o tamanho da logo em 25x25px */
+.logo-img {
+  width: 25px; 
+  height: 25px;
+  object-fit: contain; 
+}
+
+/* 3. Estiliza o texto "4all" */
+.logo-text {
+  font-size: 1.8rem; /* Use o tamanho que você tinha antes */
+  color: var(--cor-primaria); /* Use sua cor primária */
+  margin: 0;
+}
+
+/* O resto do seu CSS */
+.app-header {
+  background-color: var(--branco);
+  padding: 15px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px !important; 
+}

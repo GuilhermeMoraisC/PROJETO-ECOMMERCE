@@ -34,3 +34,35 @@
   transform: scale(1.02);
   transition: transform 0.2s ease-in-out;
 }
+
+/* Arquivo: src/pages/HomePage.css */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.product-grid {
+  display: grid;
+  /* Cria 3 colunas de tamanho igual (1fr = 1 fração) */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px; /* Espaço entre os cards */
+  margin-top: 20px;
+}
+
+/* --- Deixando Responsivo --- */
+
+/* Para tablets (2 colunas) */
+@media (max-width: 992px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Para celulares (1 coluna) */
+@media (max-width: 576px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}

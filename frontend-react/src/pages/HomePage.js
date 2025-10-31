@@ -11,7 +11,7 @@ function HomePage() {
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(true); // <-- Adicionado estado de loading
     const [error, setError] = useState(null); // <-- Adicionado estado de erro
-    const numeroFornecedor = "5511999998888"; 
+    const numeroFornecedor = "5531996809118"; 
 
     useEffect(() => {
         fetch('http://localhost/backend-php/api/get-produtos.php')
