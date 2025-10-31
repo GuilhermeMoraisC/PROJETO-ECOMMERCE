@@ -71,3 +71,20 @@
   align-items: center;
   padding: 0 20px !important; 
 }
+
+/* Adicione ao final de src/components/Header.css */
+.cart-icon-btn {
+  background: none;
+  border: 1px solid var(--cor-primaria);
+  color: var(--cor-primaria);
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.cart-icon-btn:hover {
+  background: var(--cor-primaria);
+  color: var(--branco);
+}
