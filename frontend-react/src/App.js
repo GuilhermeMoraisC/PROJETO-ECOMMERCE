@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage'; // <--- IMPORTE A PÁGINA DE LOGIN
 import ProtectedRoute from './components/ProtectedRoute'; // <--- IMPORTE O "GUARDA"
+import ProductDetailPage from './pages/ProductDetailPage';
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
 
         {/* Rota de Login (Pública) */}
         <Route path="/login" element={<LoginPage />} />
-
+        <Route path="/produto/:id" element={<ProductDetailPage />} />
+        
         {/* Rota para o Painel do Administrador (Agora Protegida) */}
         <Route 
           path="/admin" 

@@ -10,7 +10,8 @@ function ProductCard({ product, onAddToCart }) {
                 <h3 className="card-title">{product.nome}</h3>
                 <p className="card-price">R$ {parseFloat(product.preco).toFixed(2)}</p>
                 {/* <p className="card-description">{product.descricao}</p> */}
-                <button className="add-to-cart-btn" onClick={() => onAddToCart(product)}>
+                {/* <button className="add-to-cart-btn" onClick={() => onAddToCart(product)}> */}
+                <button className="add-to-cart-btn" onClick={(e) => onAddToCart(e, product)}>
                     Adicionar ao Carrinho
                 </button>
             </div>

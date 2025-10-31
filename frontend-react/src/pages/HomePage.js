@@ -1,5 +1,6 @@
-// Arquivo: src/pages/HomePage.js (CORRIGIDO)
+// Arquivo: src/pages/HomePage.js (ATUALIZADO)
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // <--- 1. IMPORTE O LINK
 import Header from '../components/Header';
 import HeroBanner from '../components/HeroBanner';
 import ProductCard from '../components/ProductCard';
@@ -8,16 +9,36 @@ import './HomePage.css';
 function HomePage() {
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
-    const numeroFornecedor = "5511999998888"; // Coleque seu número aqui
+    const [loading, setLoading] = useState(true); // <-- Adicionado estado de loading
+    const [error, setError] = useState(null); // <-- Adicionado estado de erro
+    const numeroFornecedor = "5511999998888"; 
 
     useEffect(() => {
         fetch('http://localhost/backend-php/api/get-produtos.php')
-            .then(response => response.json())
-            .then(data => setProducts(data))
-            .catch(error => console.error("Erro ao buscar produtos:", error));
+            .then(response => {
+                if (!response.ok) { // <-- Adicionada verificação de erro
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                setProducts(data);
+                setLoading(false); // <-- Desativa o loading
+            })
+            .catch(error => {
+                console.error("Erro ao buscar produtos:", error);
+                setError(error.message); // <-- Salva o erro
+                setLoading(false);
+            });
     }, []);
 
-    const handleAddToCart = (product) => {
+    // 2. ATUALIZE A FUNÇÃO PARA RECEBER O 'EVENT'
+    const handleAddToCart = (event, product) => {
+        // Impede que o clique no botão ative o Link pai
+        event.stopPropagation();
+        event.preventDefault();
+
+        // Sua lógica original
         setCart(prevCart => [...prevCart, product]);
         alert(`${product.nome} adicionado ao carrinho!`);
     };
@@ -38,9 +59,33 @@ function HomePage() {
 
         mensagem += `\n*Total: R$ ${total.toFixed(2)}*`;
 
-        // A variável 'numeroFornecedor' é usada aqui
         const link = `https://wa.me/${numeroFornecedor}?text=${encodeURIComponent(mensagem)}`;
         window.open(link, '_blank');
+    };
+
+    // Função para renderizar o conteúdo principal
+    const renderContent = () => {
+        if (loading) {
+            return <p>Carregando produtos...</p>;
+        }
+        if (error) {
+            return <p>Erro ao carregar produtos: {error}</p>;
+        }
+        if (products.length === 0) {
+            return <p>Nenhum produto encontrado.</p>;
+        }
+
+        // 3. SE TUDO DEU CERTO, RENDERIZA A GRADE
+        return products.map(product => (
+            // 4. ENVOLVA O CARD NO <LINK>
+            <Link to={`/produto/${product.id}`} key={product.id} className="product-link-wrapper">
+                <ProductCard 
+                    product={product} 
+                    // 5. PASSE A FUNÇÃO DESTA FORMA
+                    onAddToCart={(e) => handleAddToCart(e, product)} 
+                />
+            </Link>
+        ));
     };
 
     return (
@@ -56,13 +101,7 @@ function HomePage() {
                     </button>
                 </div>
                 <main className="product-grid">
-                    {products.length > 0 ? (
-                        products.map(product => (
-                            <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-                        ))
-                    ) : (
-                        <p>Carregando produtos ou nenhum produto encontrado...</p>
-                    )}
+                    {renderContent()} {/* <-- Chama a função de renderização */}
                 </main>
             </div>
         </>

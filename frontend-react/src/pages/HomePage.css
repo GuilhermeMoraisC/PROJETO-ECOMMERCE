@@ -22,3 +22,15 @@
 .whatsapp-button:hover {
   background-color: #128C7E;
 }
+
+.product-link-wrapper {
+  text-decoration: none; /* Remove sublinhado */
+  color: inherit; /* Mantém a cor original do texto */
+  display: block;
+}
+
+.product-link-wrapper:hover {
+  /* Opcional: Efeito de zoom no card */
+  transform: scale(1.02);
+  transition: transform 0.2s ease-in-out;
+}
