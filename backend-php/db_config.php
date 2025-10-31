@@ -1,8 +1,15 @@
 <?php
+// tempo de vida de vida do cookie de sessão 7 dias
+$cookie_lifetime = 60 * 60 * 24 * 7; // 7 dias em segundos
+session_set_cookie_params($cookie_lifetime);
+
+// Arquivo: backend-php/db_config.php (ATUALIZADO)
+session_start(); 
 // Arquivo: backend-php/db_config.php
 header("Access-Control-Allow-Origin: http://localhost:3000"); 
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header('Access-Control-Allow-Credentials: true');
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);

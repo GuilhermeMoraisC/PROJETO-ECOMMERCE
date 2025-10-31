@@ -6,6 +6,11 @@ require_once '../../db_config.php';
 
 // --- (IMPORTANTE: No futuro, adicione aqui uma verificação para garantir que apenas o admin logado pode executar este script) ---
 
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    http_response_code(401); // Não autorizado
+    die(json_encode(['success' => false, 'message' => 'Acesso não autorizado. Faça login primeiro.']));
+}
+
 $response = ['success' => false, 'message' => 'Nenhum arquivo enviado.'];
 
 // Verifica se um arquivo foi enviado e se não houve erro no upload

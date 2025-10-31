@@ -4,6 +4,11 @@ require_once '../../db_config.php';
 
 // --- (Lógica de verificação de login do admin virá aqui) ---
 
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    http_response_code(401); // Não autorizado
+    die(json_encode(['success' => false, 'message' => 'Acesso não autorizado. Faça login primeiro.']));
+}
+
 $nome = $_POST['nome'] ?? '';
 $descricao = $_POST['descricao'] ?? '';
 $preco = $_POST['preco'] ?? 0;
