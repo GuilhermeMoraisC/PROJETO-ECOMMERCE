@@ -1,81 +1,109 @@
-/* Arquivo: src/pages/ProductDetailPage.css (NOVO) */
+/* Arquivo: src/pages/ProductDetailPage.css */
 
-.product-content {
-  display: flex;
-  flex-wrap: wrap; /* Para telas menores */
-  gap: 40px;
-  margin-top: 40px;
+.product-detail-page {
+  background-color: var(--fundo-claro); /* Assumindo uma variável de fundo */
+  min-height: 100vh;
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* --- Layout Principal (Duas Colunas) --- */
+.product-content {
+  display: flex;
+  gap: 40px; /* Espaço entre as colunas */
+  background-color: var(--branco);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Coluna da Imagem */
 .product-image-container {
   flex: 1;
-  min-width: 300px;
+  max-width: 50%;
+  text-align: center;
 }
 
 .product-image-large {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
-  border: 1px solid var(--borda-suave, #eee);
-  background-color: white;
+  max-height: 500px;
+  object-fit: contain; /* Garante que a imagem se ajuste */
+  border-radius: 6px;
 }
 
+/* Coluna das Informações */
 .product-info-container {
   flex: 1;
-  min-width: 300px;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
 }
 
+/* --- Tipografia e Preços --- */
 .product-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--texto-escuro);
   margin-top: 0;
-  margin-bottom: 20px;
-  color: var(--texto-escuro, #333);
+  margin-bottom: 10px;
 }
 
 .product-price-large {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: bold;
-  color: var(--cor-primaria, #f57c00);
+  color: var(--cor-primaria);
   margin-bottom: 25px;
 }
 
 .product-section-title {
   font-size: 1.2rem;
-  font-weight: 600;
-  border-bottom: 2px solid var(--borda-suave, #eee);
+  color: #555;
+  border-bottom: 2px solid var(--borda-suave);
   padding-bottom: 5px;
-  margin-top: 30px;
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 .product-description {
-  font-size: 1rem;
+  margin-top: 10px;
+  color: #666;
   line-height: 1.6;
-  color: #555;
-  white-space: pre-wrap; /* Preserva quebras de linha e espaços */
+  flex-grow: 1; /* Permite que o texto empurre o botão para baixo */
 }
 
+/* --- Botão Grande --- */
 .add-to-cart-btn-large {
   background-color: var(--cor-primaria);
   color: var(--branco);
   border: none;
   padding: 15px 30px;
-  border-radius: 5px;
-  font-size: 1.1rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 30px;
-  width: 100%;
+  transition: 0.3s;
+  margin-top: 20px;
 }
 
 .add-to-cart-btn-large:hover {
   background-color: #e65c00;
 }
 
-.error-message {
-  color: #D32F2F;
-  font-size: 1.2rem;
-  font-weight: bold;
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+  .product-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .product-image-container, .product-info-container {
+    max-width: 100%;
+  }
+  .product-title {
+    font-size: 1.8rem;
+  }
+  .product-price-large {
+    font-size: 2rem;
+  }
 }

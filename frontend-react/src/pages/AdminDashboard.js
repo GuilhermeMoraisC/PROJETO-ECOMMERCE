@@ -1,25 +1,29 @@
-// Arquivo: src/pages/AdminDashboard.js (VERSÃO FINAL COM CORREÇÃO DE UNUSED VARS)
+// Arquivo: src/pages/AdminDashboard.js (VERSÃO FINAL COMPLETA E CORRIGIDA)
 import React, { useState, useEffect } from 'react';
 import { useAuth, apiFetch } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css'; 
 
 function AdminDashboard() {
-  const [produtos, setProdutos] = useState([]); // Lista principal de produtos
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para o modal de edição
-  const [produtoEditando, setProdutoEditando] = useState(null); // Produto sendo editado
+  const [produtos, setProdutos] = useState([]); 
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [produtoEditando, setProdutoEditando] = useState(null); 
 
-  // Estados para o formulário de NOVO PRODUTO (mantidos)
+  // Estados para o formulário de NOVO PRODUTO
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
   const [imagem, setImagem] = useState(null);
+  const [categoriaId, setCategoriaId] = useState(''); // <--- NOVO ESTADO PARA O ID DA CATEGORIA
   
-  // Estados para o formulário de IMPORTAR CSV (mantidos)
-  const [csvFile, setCsvFile] = useState(null); // <--- AGORA USADO
-  const [mensagemCsv, setMensagemCsv] = useState(''); // <--- AGORA USADO
+  // Estados para CATEGORIAS
+  const [categorias, setCategorias] = useState([]); 
 
-  // Estados para o formulário de MUDAR SENHA (mantidos)
+  // Estados para IMPORTAR CSV (mantidos)
+  const [csvFile, setCsvFile] = useState(null); 
+  const [mensagemCsv, setMensagemCsv] = useState(''); 
+
+  // Estados para MUDAR SENHA (mantidos)
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,15 +31,15 @@ function AdminDashboard() {
   // Estados para mensagens de feedback
   const [mensagemProduto, setMensagemProduto] = useState('');
   const [mensagemSenha, setMensagemSenha] = useState('');
-  const [mensagemCrud, setMensagemCrud] = useState(''); // Mensagens da lista/edição
+  const [mensagemCrud, setMensagemCrud] = useState(''); 
 
   // Hooks
   const auth = useAuth();
   const navigate = useNavigate();
 
-  // Função para buscar a lista de produtos (R - Read)
+
+  // FUNÇÃO DE BUSCA DE PRODUTOS
   const fetchProdutos = async () => {
-    // ... (lógica fetchProdutos mantida)
     try {
       setMensagemCrud('Carregando produtos...');
       const response = await apiFetch('http://localhost/backend-php/api/get-produtos.php');
@@ -51,13 +55,29 @@ function AdminDashboard() {
     }
   };
 
+  // FUNÇÃO DE BUSCA DE CATEGORIAS (NOVA)
+  const fetchCategorias = async () => {
+    try {
+      const response = await apiFetch('http://localhost/backend-php/api/get-categorias.php');
+      const data = await response.json();
+      setCategorias(data);
+      // Define a primeira categoria como padrão
+      if (data.length > 0) {
+          setCategoriaId(data[0].id);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar categorias:", error);
+    }
+  };
+
+  // Carrega produtos e categorias na montagem
   useEffect(() => {
     fetchProdutos();
+    fetchCategorias(); // <--- CHAMA FUNÇÃO DE CATEGORIAS
   }, []); 
 
   // Handler para Excluir Produto (D - Delete)
   const handleDelete = async (produtoId) => {
-    // ... (lógica handleDelete mantida)
     if (!window.confirm(`Tem certeza que deseja deletar o produto ID ${produtoId}?`)) { return; }
     setMensagemCrud(`Deletando produto ID ${produtoId}...`);
 
@@ -101,7 +121,6 @@ function AdminDashboard() {
 
   // Função para Trocar Senha (mantida)
   const handleChangePasswordSubmit = async (e) => {
-    // ... (lógica handleChangePasswordSubmit mantida)
     e.preventDefault();
     setMensagemSenha('');
     if (newPassword.length < 6) { setMensagemSenha('Erro: A nova senha deve ter pelo menos 6 caracteres.'); return; }
@@ -126,15 +145,15 @@ function AdminDashboard() {
     }
   };
 
-  // Handler de Novo Produto (C - Create) (mantido)
+  // Handler de Novo Produto (C - Create) (ATUALIZADO PARA CATEGORIA)
   const handleProdutoSubmit = async (e) => {
-    // ... (lógica handleProdutoSubmit mantida)
     e.preventDefault();
     setMensagemProduto('Enviando...');
     const formData = new FormData();
     formData.append('nome', nome);
     formData.append('descricao', descricao);
     formData.append('preco', preco);
+    formData.append('categoria_id', categoriaId); // <--- NOVO: ENVIA CATEGORIA
     formData.append('imagem', imagem); 
 
     try {
@@ -155,7 +174,7 @@ function AdminDashboard() {
     }
   };
 
-  // Handler de Importação CSV (R - Read) (REINTRODUZIDO)
+  // Handler de Importação CSV (R - Read) (mantido)
   const handleCsvSubmit = async (e) => {
     e.preventDefault();
     if (!csvFile) {
@@ -175,7 +194,7 @@ function AdminDashboard() {
       const data = await response.json();
       if (data.success) {
         setMensagemCsv(`Sucesso: ${data.message}`);
-        fetchProdutos(); // Recarrega a lista após a importação
+        fetchProdutos(); 
       } else {
         setMensagemCsv(`Erro: ${data.message}`);
       }
@@ -198,39 +217,35 @@ function AdminDashboard() {
 
       <hr className="divider" />
       
-      {/* --- Seção de LISTAGEM DE PRODUTOS (R - Read, D - Delete, U - Update) --- */}
+      {/* --- Seção de LISTAGEM DE PRODUTOS --- */}
       <div className="form-section">
-        {/* ... (Conteúdo da listagem mantido) ... */}
         <h3>Produtos Cadastrados ({produtos.length})</h3>
         {mensagemCrud && <p className="feedback-message">{mensagemCrud}</p>}
 
         <table className="products-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Preço</th>
-              <th>Imagem</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {produtos.map(p => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.nome}</td>
-                <td>R$ {parseFloat(p.preco).toFixed(2)}</td>
-                <td>
-                  <img src={p.imagem_url} alt={p.nome} className="product-thumb" />
-                </td>
-                <td>
-                  <button onClick={() => handleEdit(p)} className="btn-action btn-edit">Editar</button>
-                  <button onClick={() => handleDelete(p.id)} className="btn-action btn-delete">Excluir</button>
-                </td>
-              </tr>
-            ))}
-            {produtos.length === 0 && <tr><td colSpan="5">Nenhum produto cadastrado.</td></tr>}
-          </tbody>
+   <thead>
+  <tr>
+    <th>ID</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Imagem</th><th>Ações</th>
+  </tr>
+</thead>
+         <tbody>
+  {produtos.map(p => (
+    <tr key={p.id}>
+      <td>{p.id}</td>
+      <td>{p.nome}</td>
+      <td>{p.categoria_nome || 'N/A'}</td>
+      <td>R$ {parseFloat(p.preco).toFixed(2)}</td>
+      <td>
+        <img src={p.imagem_url} alt={p.nome} className="product-thumb" />
+      </td>
+      <td>
+        <button onClick={() => handleEdit(p)} className="btn-action btn-edit">Editar</button>
+        <button onClick={() => handleDelete(p.id)} className="btn-action btn-delete">Excluir</button>
+      </td>
+    </tr>
+  ))}
+  {produtos.length === 0 && <tr><td colSpan="6">Nenhum produto cadastrado.</td></tr>}
+</tbody>
         </table>
       </div>
 
@@ -243,6 +258,23 @@ function AdminDashboard() {
           <div className="form-group"><label>Nome:</label><input type="text" onChange={(e) => setNome(e.target.value)} required /></div>
           <div className="form-group"><label>Descrição:</label><textarea onChange={(e) => setDescricao(e.target.value)} /></div>
           <div className="form-group"><label>Preço:</label><input type="number" step="0.01" onChange={(e) => setPreco(e.target.value)} required /></div>
+          
+          {/* CAMPO DE CATEGORIA (NOVO) */}
+          <div className="form-group">
+            <label>Categoria:</label>
+            <select 
+                value={categoriaId} 
+                onChange={(e) => setCategoriaId(e.target.value)}
+                required
+            >
+                {categorias.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                        {cat.nome}
+                    </option>
+                ))}
+            </select>
+          </div>
+          
           <div className="form-group"><label>Imagem:</label><input type="file" onChange={(e) => setImagem(e.target.files[0])} accept="image/*" required /></div>
           <button type="submit" className="btn-submit">Salvar Produto</button>
         </form>
@@ -251,10 +283,9 @@ function AdminDashboard() {
 
       <hr className="divider" />
 
-      {/* --- Seção de IMPORTAÇÃO CSV (R - Read) --- */}
+      {/* --- Seção de IMPORTAÇÃO CSV --- */}
       <div className="form-section">
         <h3>Importar Produtos em Massa (via CSV)</h3>
-        {/* CORREÇÃO APLICADA AQUI: Reintroduzindo o formulário */}
         <form onSubmit={handleCsvSubmit}>
           <div className="form-group">
             <label>Arquivo .csv:</label>
@@ -271,7 +302,7 @@ function AdminDashboard() {
           </p>
           <button type="submit" className="btn-submit">Importar CSV</button>
         </form>
-        {mensagemCsv && <p className="feedback-message">{mensagemCsv}</p>} {/* <--- AGORA USADO */}
+        {mensagemCsv && <p className="feedback-message">{mensagemCsv}</p>}
       </div>
 
       <hr className="divider" />
@@ -295,6 +326,7 @@ function AdminDashboard() {
           onClose={handleCloseModal} 
           apiFetch={apiFetch} 
           backendUrl={'http://localhost/backend-php/api/admin/update-produto.php'}
+          categorias={categorias} // <--- PASSA AS CATEGORIAS PARA O MODAL
         />
       )}
     </div>
@@ -305,11 +337,12 @@ export default AdminDashboard;
 
 
 // --- Componente Modal de Edição (U - Update) ---
-function ModalEdicao({ produto, onClose, apiFetch, backendUrl }) {
-    // ... (Conteúdo do ModalEdicao mantido)
+function ModalEdicao({ produto, onClose, apiFetch, backendUrl, categorias }) { // <--- RECEBE CATEGORIAS
+    // Estados locais para o formulário do modal
     const [nome, setNome] = useState(produto.nome);
     const [descricao, setDescricao] = useState(produto.descricao);
     const [preco, setPreco] = useState(parseFloat(produto.preco).toFixed(2));
+    const [categoriaId, setCategoriaId] = useState(produto.categoria_id || ''); // <--- NOVO ESTADO
     const [imagemNova, setImagemNova] = useState(null);
     const [mensagemModal, setMensagemModal] = useState('');
 
@@ -322,6 +355,7 @@ function ModalEdicao({ produto, onClose, apiFetch, backendUrl }) {
         formData.append('nome', nome);
         formData.append('descricao', descricao);
         formData.append('preco', preco);
+        formData.append('categoria_id', categoriaId); // <--- NOVO: ENVIA CATEGORIA
         formData.append('imagem_atual', produto.imagem_path); 
 
         if (imagemNova) {
@@ -367,6 +401,22 @@ function ModalEdicao({ produto, onClose, apiFetch, backendUrl }) {
                     <div className="form-group">
                         <label>Preço:</label>
                         <input type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required />
+                    </div>
+                    
+                    {/* CAMPO DE CATEGORIA NO MODAL (NOVO) */}
+                    <div className="form-group">
+                        <label>Categoria:</label>
+                        <select 
+                            value={categoriaId} 
+                            onChange={(e) => setCategoriaId(e.target.value)}
+                            required
+                        >
+                            {categorias.map(cat => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.nome}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="current-image">

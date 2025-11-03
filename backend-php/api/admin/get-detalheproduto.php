@@ -1,43 +1,43 @@
 <?php
-// Arquivo: backend-php/api/get-produto.php (NOVO)
-require_once '../db_config.php'; // Inclui CORS, Sessão e Conexão DB
+// Arquivo: backend-php/api/get-detalheproduto.php
+require_once '../db_config.php'; // Inclui conexão com DB e headers CORS
 
-$response = null;
+$response = ['success' => false, 'message' => 'Produto não encontrado.'];
 
-// 1. Verifica se um ID foi enviado na URL (ex: ...php?id=5)
-if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+// 1. Pega o ID da URL (ex: ?id=9)
+$produto_id = $_GET['id'] ?? 0;
+
+if ($produto_id > 0) {
     
-    $product_id = (int)$_GET['id'];
+    // 2. Prepara a query (SELECT)
+    $sql = "SELECT id, nome, descricao, preco, imagem_path FROM produtos WHERE id = ?";
+    $stmt = $conn->prepare($sql);
     
-    // 2. Prepara a query segura para buscar UM produto
-    $stmt = $conn->prepare("SELECT id, nome, descricao, preco, imagem_path FROM produtos WHERE id = ?");
-    $stmt->bind_param("i", $product_id);
+    // 3. Executa a busca
+    $stmt->bind_param("i", $produto_id);
     $stmt->execute();
+    
     $result = $stmt->get_result();
     
-    if ($result && $result->num_rows > 0) {
-        // 3. Produto encontrado
-        $produto = $result->fetch_assoc();
+    if ($result && $result->num_rows === 1) {
+        $row = $result->fetch_assoc();
         
-        // Adiciona a URL completa da imagem, igual ao get-produtos.php
-        $produto['imagem_url'] = "http://localhost/backend-php/uploads/" . $produto['imagem_path'];
+        // 4. Constrói a URL da imagem (usando o caminho corrigido)
+        $row['imagem_url'] = "http://localhost/backend-php/uploads/" . $row['imagem_path'];
         
-        $response = $produto; // Resposta é o objeto do produto
-        
-    } else {
-        // 4. Produto não encontrado com esse ID
-        http_response_code(404); // Not Found
-        $response = ['success' => false, 'message' => 'Produto não encontrado.'];
+        $response = [
+            'success' => true,
+            'produto' => $row
+        ];
     }
-    $stmt->close();
     
-} else {
-    // 5. Nenhum ID foi fornecido na URL
-    http_response_code(400); // Bad Request
-    $response = ['success' => false, 'message' => 'ID de produto inválido ou não fornecido.'];
+    $stmt->close();
 }
 
 $conn->close();
 header('Content-Type: application/json');
-echo json_encode($response);
+
+// O front-end espera o objeto do produto. Se sucesso for true, usamos $response['produto'].
+// Se falhar, retorna a mensagem de erro.
+echo json_encode($response['success'] ? $response['produto'] : $response);
 ?>

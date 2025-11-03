@@ -1,161 +1,182 @@
-// Arquivo: src/pages/HomePage.js (VERSÃO CORRIGIDA)
+// Arquivo: src/pages/HomePage.js (VERSÃO FINAL COMPLETA)
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify'; 
-import 'react-toastify/dist/ReactToastify.css';
-
 import Header from '../components/Header';
 import HeroBanner from '../components/HeroBanner';
 import ProductCard from '../components/ProductCard';
 import CartSidebar from '../components/CartSidebar'; 
-import './HomePage.css';
+import './HomePage.css'; 
 
 function HomePage() {
-    const [products, setProducts] = useState([]);
-    const [cartItems, setCartItems] = useState([]); 
-    const [isCartOpen, setIsCartOpen] = useState(false); 
-    const [loading, setLoading] = useState(true); 
-    const [error, setError] = useState(null); 
-    const numeroFornecedor = "5531996809118"; 
+  const [todosProdutos, setTodosProdutos] = useState([]); // Lista COMPLETA (Para busca)
+  const [produtosExibidos, setProdutosExibidos] = useState([]); // Lista FILTRADA (Para exibir)
+  const [carrinho, setCarrinho] = useState([]); 
+  const [erro, setErro] = useState(null);
+  const [isCartOpen, setIsCartOpen] = useState(false); 
 
-    useEffect(() => {
-        fetch('http://localhost/backend-php/api/get-produtos.php')
-            .then(response => {
-                if (!response.ok) { 
-                    throw new Error(`Erro HTTP: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // CORREÇÃO AQUI: Garante que o preço seja um número ou 0
-                const produtosComNumero = data.map(p => ({ 
-                    ...p, 
-                    preco: parseFloat(p.preco) || 0 // <-- Se p.preco for null/undefined, vira 0
-                }));
-                setProducts(produtosComNumero);
-                setLoading(false); 
-            })
-            .catch(error => {
-                console.error("Erro ao buscar produtos:", error);
-                setError(error.message); 
-                setLoading(false);
-            });
-    }, []);
+  // Calcula o número total de itens no carrinho
+  const cartItemCount = carrinho.reduce((acc, item) => acc + item.quantity, 0); 
 
-    // Lógica de Adicionar ao Carrinho (com quantidade)
-    const handleAddToCart = (event, product) => {
-        event.stopPropagation(); 
-        event.preventDefault();
-
-        setCartItems(prevItems => {
-            const existingItem = prevItems.find(item => item.id === product.id);
-
-            if (existingItem) {
-                toast.info(`Mais um ${product.nome} adicionado!`); 
-                return prevItems.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                );
-            } else {
-                toast.success(`"${product.nome}" adicionado ao carrinho!`); 
-                return [...prevItems, { ...product, quantity: 1 }];
-            }
-        });
+  // 1. Lógica de Busca de Produtos (Executado na montagem)
+  useEffect(() => {
+    const fetchProdutos = async () => {
+      try {
+        const response = await fetch('http://localhost/backend-php/api/get-produtos.php');
         
-        setIsCartOpen(true);
+        // Se a resposta não for JSON (erro de PHP), lança o erro.
+        if (!response.ok) {
+          throw new Error('Falha ao buscar produtos');
+        }
+        
+        const data = await response.json();
+        
+        // Garante que o preço é um número antes de salvar
+        const produtosTratados = data.map(p => ({
+            ...p,
+            preco: parseFloat(p.preco) || 0
+        }));
+
+        setTodosProdutos(produtosTratados); 
+        setProdutosExibidos(produtosTratados);
+      } catch (err) {
+        setErro('Erro ao buscar produtos: ' + err.message);
+      }
     };
+    fetchProdutos();
+  }, []); 
+
+
+  // 2. Lógica de Busca (Recebe o termo do Header)
+  const handleSearch = (searchTerm) => {
+    const termo = searchTerm.toLowerCase();
     
-    // Funções de Gerenciar o Carrinho
-    const handleRemoveItem = (productId) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
-        toast.error('Produto removido.');
-    };
+    if (termo === '') {
+      setProdutosExibidos(todosProdutos);
+      return;
+    }
 
-    const handleUpdateQuantity = (productId, newQuantity) => {
-        if (newQuantity <= 0) {
-            handleRemoveItem(productId);
-            return;
-        }
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item.id === productId ? { ...item, quantity: newQuantity } : item
-            )
-        );
-    };
-
-    // Lógica do WhatsApp (COM CORREÇÃO)
-    const generateWhatsAppLink = () => {
-        if (cartItems.length === 0) {
-            toast.error("Seu carrinho está vazio!"); // Substitui o alert
-            return;
-        }
-
-        let mensagem = "Olá! Gostaria de fazer um pedido com os seguintes itens:\n\n";
-        let total = 0;
-
-        cartItems.forEach(item => {
-            // CORREÇÃO AQUI: Garante que o preço seja um número ou 0
-            const precoItem = parseFloat(item.preco) || 0;
-            const quantidadeItem = parseInt(item.quantity) || 1;
-
-            mensagem += `- ${quantidadeItem}x ${item.nome} (R$ ${precoItem.toFixed(2)} cada)\n`;
-            total += precoItem * quantidadeItem;
-        });
-
-        mensagem += `\n*Total: R$ ${total.toFixed(2)}*`;
-
-        const link = `https://wa.me/${numeroFornecedor}?text=${encodeURIComponent(mensagem)}`;
-        window.open(link, '_blank');
-    };
-
-    // Função de renderização (mantida como a sua)
-    const renderContent = () => {
-        if (loading) { return <p>Carregando produtos...</p>; }
-        if (error) { return <p>Erro ao carregar produtos: {error}</p>; }
-        if (products.length === 0) { return <p>Nenhum produto encontrado.</p>; }
-
-        return products.map(product => (
-            <Link to={`/produto/${product.id}`} key={product.id} className="product-link-wrapper">
-                <ProductCard 
-                    product={product} 
-                    onAddToCart={(e) => handleAddToCart(e, product)} 
-                />
-            </Link>
-        ));
-    };
-
-    return (
-        <>
-            <Header 
-                cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)} 
-                onOpenCart={() => setIsCartOpen(true)}
-            />
-            <HeroBanner />
-            <div className="container">
-                <div className="page-header">
-                    <h2 className="page-title">Nossos Produtos</h2>
-                </div>
-                <main className="product-grid">
-                    {renderContent()}
-                </main>
-            </div>
-            
-            <CartSidebar
-                cartItems={cartItems}
-                isOpen={isCartOpen}
-                onClose={() => setIsCartOpen(false)}
-                onRemove={handleRemoveItem}
-                onUpdateQuantity={handleUpdateQuantity}
-                onCheckout={generateWhatsAppLink} 
-            />
-            <ToastContainer 
-                position="top-right" 
-                autoClose={2000} 
-                hideProgressBar={false} 
-                newestOnTop={false} 
-                closeOnClick 
-            />
-        </>
+    // Filtra a lista COMPLETA
+    const resultados = todosProdutos.filter(produto => 
+      produto.nome.toLowerCase().includes(termo) ||
+      produto.descricao.toLowerCase().includes(termo)
     );
+
+    setProdutosExibidos(resultados);
+  };
+
+
+  // 3. Lógica de Adicionar ao Carrinho (Para ProductCard)
+  const handleAddToCart = (product) => {
+    setCarrinho(prevCart => {
+        const itemExistente = prevCart.find(item => item.id === product.id);
+
+        if (itemExistente) {
+            return prevCart.map(item =>
+                item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+            );
+        } else {
+            // Garante que o preço seja tratado como float antes de adicionar
+            const precoFloat = parseFloat(product.preco) || 0;
+            return [...prevCart, { ...product, quantity: 1, preco: precoFloat }];
+        }
+    });
+    setIsCartOpen(true); // Abre o sidebar ao adicionar
+  };
+
+  // Funções de manipulação do CartSidebar
+  const handleRemoveItem = (id) => {
+    setCarrinho(prevCart => prevCart.filter(item => item.id !== id));
+  };
+
+  const handleUpdateQuantity = (id, newQuantity) => {
+    if (newQuantity <= 0) {
+        handleRemoveItem(id);
+        return;
+    }
+    setCarrinho(prevCart => prevCart.map(item =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+    ));
+  };
+  
+  const handleCheckout = () => {
+    // Lógica completa para WhatsApp
+    if (carrinho.length === 0) return;
+    const itensMsg = carrinho.map(item => 
+        `${item.quantity}x ${item.nome} (R$ ${(item.preco * item.quantity).toFixed(2)})`
+    ).join('\n');
+    const total = carrinho.reduce((acc, item) => acc + item.preco * item.quantity, 0);
+    const mensagem = `Olá! Gostaria de fazer o seguinte pedido:\n\n${itensMsg}\n\nTotal do Pedido: R$ ${total.toFixed(2)}\n\nAguardo o pagamento e a confirmação.`;
+    const numeroWhatsApp = "5500000000000"; 
+    const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+  };
+
+
+  // 4. Lógica de Agrupamento por Categoria (para carrosséis/seções)
+  const groupProdutosByCategoria = (produtos) => {
+    return produtos.reduce((grupos, produto) => {
+      // Usa o nome retornado pelo PHP
+      const categoria = produto.categoria_nome || 'Sem Categoria'; 
+      if (!grupos[categoria]) {
+        grupos[categoria] = [];
+      }
+      grupos[categoria].push(produto);
+      return grupos;
+    }, {});
+  };
+
+  const produtosAgrupados = groupProdutosByCategoria(produtosExibidos);
+  const categoriasKeys = Object.keys(produtosAgrupados);
+
+
+  return (
+    <div className="homepage">
+      {/* Header */}
+      <Header 
+        onSearch={handleSearch} 
+        cartItemCount={cartItemCount}
+        onCartClick={() => setIsCartOpen(true)}
+      /> 
+      
+      <HeroBanner />
+
+      <main className="container">
+        <h2>Catálogo de Produtos</h2>
+        
+        {/* Exibição de Erro */}
+        {erro && <p style={{color: 'red'}}>{erro}</p>}
+
+        {/* Renderiza as seções por Categoria */}
+        {categoriasKeys.length > 0 ? (
+          categoriasKeys.map(categoriaNome => (
+            <div key={categoriaNome} className="category-section">
+              <h3>{categoriaNome}</h3>
+                <div className="product-grid">
+                  {produtosAgrupados[categoriaNome].map(produto => (
+                    <ProductCard 
+                      key={produto.id} 
+                      product={produto} 
+                      onAddToCart={handleAddToCart}
+                    />
+                  ))}
+                </div>
+            </div>
+          ))
+        ) : (
+          !erro && <p>Nenhum produto cadastrado.</p>
+        )}
+      </main>
+
+      {/* Sidebar do Carrinho */}
+      <CartSidebar 
+        cartItems={carrinho}
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onRemove={handleRemoveItem}
+        onUpdateQuantity={handleUpdateQuantity}
+        onCheckout={handleCheckout}
+      />
+    </div>
+  );
 }
 
 export default HomePage;

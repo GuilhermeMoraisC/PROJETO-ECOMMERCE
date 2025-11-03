@@ -1,23 +1,28 @@
-// Arquivo: src/App.js (VERSÃO ATUALIZADA)
+// Arquivo: src/App.js (VERSÃO COMPLETA FINAL)
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Componentes Públicos
 import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage'; 
+import ResetPasswordPage from './pages/ResetPasswordPage'; 
+import ProductDetailPage from './pages/ProductDetailPage'; // Assumindo este nome
+
+// Componentes Protegidos
 import AdminDashboard from './pages/AdminDashboard';
-import LoginPage from './pages/LoginPage'; // <--- IMPORTE A PÁGINA DE LOGIN
-import ProtectedRoute from './components/ProtectedRoute'; // <--- IMPORTE O "GUARDA"
-import ProductDetailPage from './pages/ProductDetailPage';
+import ProtectedRoute from './components/ProtectedRoute'; 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota para a Página Principal (Pública) */}
-        <Route path="/" element={<HomePage />} />
-
-        {/* Rota de Login (Pública) */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/produto/:id" element={<ProductDetailPage />} />
         
-        {/* Rota para o Painel do Administrador (Agora Protegida) */}
+        {/* ROTAS PÚBLICAS */}
+        <Route path="/" element={<HomePage />} /> 
+        <Route path="/produto/:id" element={<ProductDetailPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/reset-senha" element={<ResetPasswordPage />} /> 
+
+        {/* ROTA PROTEGIDA */}
         <Route 
           path="/admin" 
           element={
@@ -26,6 +31,7 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        
       </Routes>
     </BrowserRouter>
   );

@@ -1,28 +1,38 @@
-// Arquivo: src/components/Header.js (ATUALIZADO)
+// Arquivo: src/components/Header.js (VERSÃO FINAL)
 import React from 'react';
-import './Header.css';
-import logoImage from './images/logo.png';
+import './Header.css'; 
+// Instale se ainda não o fez: npm install react-icons
+import { FaShoppingCart, FaSearch } from 'react-icons/fa'; 
 
-// Recebe as novas props 'cartCount' e 'onOpenCart'
-function Header({ cartCount, onOpenCart }) { 
+// O componente agora recebe 3 props: onSearch, cartItemCount, e onCartClick
+function Header({ onSearch, cartItemCount, onCartClick }) {
   return (
     <header className="app-header">
       <div className="container header-content">
+        <h1 className="logo">4all</h1>
         
-        <div className="logo-container">
-          <img 
-            src={logoImage} 
-            alt="Logo 4all" 
-            className="logo-img" 
+        {/* Campo de Busca (do passo anterior) */}
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Buscar produtos..."
+            // Esta função deve ser implementada na HomePage e passada via prop
+            onChange={(e) => onSearch(e.target.value)} 
           />
-          <h1 className="logo-text">4all</h1>
+          <FaSearch className="search-icon" />
         </div>
-        
-        {/* NOVO: Botão/Ícone do Carrinho */}
-        <button className="cart-icon-btn" onClick={onOpenCart}>
-            🛒 Carrinho ({cartCount || 0}) 
-        </button>
 
+        {/* ÍCONE DO CARRINHO: Onde a correção acontece */}
+        <div 
+          className="cart-icon-container" 
+          onClick={onCartClick} // <--- ISTO ABRE O SIDEBAR
+        > 
+          <FaShoppingCart className="cart-icon" />
+          {/* Badge de contagem */}
+          {cartItemCount > 0 && (
+            <span className="cart-badge">{cartItemCount}</span>
+          )}
+        </div>
       </div>
     </header>
   );

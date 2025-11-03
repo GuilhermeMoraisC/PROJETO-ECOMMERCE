@@ -1,3 +1,4 @@
+// Arquivo: src/components/HeroBanner.js (BUG CORRIGIDO)
 import React from 'react';
 import Slider from 'react-slick';
 import './HeroBanner.css';
@@ -14,6 +15,8 @@ import produto5 from './images//produto5.jpg';
 function HeroBanner() {
   // Array com as imagens do carrossel
   const imagens = [produto1, produto2, produto3, produto4, produto5];
+  
+  // <img src={produto1 }/> <--- LINHA REMOVIDA PARA CORRIGIR O ERRO DE COMPILAÇÃO
 
   // Configurações do carrossel
   const settings = {

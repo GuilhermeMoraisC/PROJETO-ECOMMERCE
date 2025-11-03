@@ -1,66 +1,11 @@
-/* Arquivo: src/components/Header.css */
-.app-header {
-  background-color: #e65c00;
-  padding: 15px 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  position: sticky; /* Faz o cabeçalho ficar fixo no topo */
-  top: 0;
-  z-index: 1000;
-}
+/* Arquivo: src/components/Header.css (ATUALIZADO) */
 
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px !important; /* Sobrescreve o padding do container geral */
-}
-
-.logo {
-  font-size: 1.8rem;
-  color: var(--cor-primaria);
-  margin: 0;
-}
-
-/* Arquivo: src/components/Header.css */
-
-/* Define o tamanho exato do logo */
-.logo-img {
-  width: 25px; 
-  height: 25px;
-  object-fit: contain; /* Garante que a imagem se encaixe sem distorcer, se necessário */
-}
-
-/* Arquivo: src/components/Header.css */
-
-/* 1. Alinha a logo e o texto no centro */
-.logo-container {
-  display: flex;
-  align-items: center; /* Centraliza verticalmente */
-  gap: 8px; /* Espaço entre a imagem e o texto */
-}
-
-/* 2. Mantém o tamanho da logo em 25x25px */
-.logo-img {
-  width: 25px; 
-  height: 25px;
-  object-fit: contain; 
-}
-
-/* 3. Estiliza o texto "4all" */
-.logo-text {
-  font-size: 1.8rem; /* Use o tamanho que você tinha antes */
-  color: var(--cor-primaria); /* Use sua cor primária */
-  margin: 0;
-}
-
-/* O resto do seu CSS */
 .app-header {
   background-color: var(--branco);
   padding: 15px 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
-  position: sticky;
+  position: sticky; 
   top: 0;
   z-index: 1000;
 }
@@ -72,19 +17,63 @@
   padding: 0 20px !important; 
 }
 
-/* Adicione ao final de src/components/Header.css */
-.cart-icon-btn {
-  background: none;
-  border: 1px solid var(--cor-primaria);
+.logo {
+  font-size: 1.8rem;
   color: var(--cor-primaria);
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s;
+  margin: 0;
 }
 
-.cart-icon-btn:hover {
-  background: var(--cor-primaria);
-  color: var(--branco);
+/* --- Estilos para o Campo de Busca --- */
+.search-bar {
+  position: relative;
+  flex-grow: 1; /* Permite que a barra de busca ocupe espaço */
+  max-width: 400px;
+  margin: 0 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px 15px 8px 35px; /* Espaço para o ícone */
+  border: 1px solid var(--borda-suave);
+  border-radius: 20px;
+  font-size: 1rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+
+/* --- Estilos para o Carrinho --- */
+.cart-icon-container {
+  position: relative;
+  cursor: pointer;
+  padding: 5px;
+  transition: opacity 0.2s;
+}
+
+.cart-icon-container:hover {
+  opacity: 0.8;
+}
+
+.cart-icon {
+  font-size: 1.8rem;
+  color: var(--cor-primaria);
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: var(--cor-secundaria); /* Ex: Vermelho */
+  color: white;
+  border-radius: 50%;
+  padding: 2px 7px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  pointer-events: none; /* Garante que o clique passe para o container */
 }
