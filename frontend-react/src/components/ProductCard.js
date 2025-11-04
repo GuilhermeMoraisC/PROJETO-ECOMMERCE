@@ -1,4 +1,4 @@
-// Arquivo: src/components/ProductCard.js (ATUALIZADO)
+// Arquivo: src/components/ProductCard.js (CORRIGIDO)
 import React from 'react';
 import './ProductCard.css';
 
@@ -9,12 +9,14 @@ function ProductCard({ product, onAddToCart }) {
             <div className="card-body">
                 <h3 className="card-title">{product.nome}</h3>
                 <p className="card-price">R$ {parseFloat(product.preco).toFixed(2)}</p>
-                {/* <p className="card-description">{product.descricao}</p> */}
-                {/* <button className="add-to-cart-btn" onClick={() => onAddToCart(product)}> */}
-               {/* <button className="add-to-cart-btn" onClick={(e) => onAddToCart(e, product)}> */}
-                <button className="add-to-cart-btn" onClick={() => onAddToCart(product)}>
-                    Adicionar ao Carrinho
-                </button>
+                
+                {/* CORREÇÃO AQUI: 
+                  Mude de: onClick={() => onAddToCart(product)}
+                  Para:   onClick={(e) => onAddToCart(e, product)}
+                */}
+                <button className="add-to-cart-btn" onClick={(e) => onAddToCart(e, product)}>
+                    Adicionar ao Carrinho
+                </button>
             </div>
         </div>
     );

@@ -1,182 +1,187 @@
-// Arquivo: src/pages/HomePage.js (VERSÃO FINAL COMPLETA)
-import React, { useState, useEffect } from 'react';
+// Arquivo: src/pages/HomePage.js (VERSÃO FINAL CORRIGIDA)
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
+
 import Header from '../components/Header';
 import HeroBanner from '../components/HeroBanner';
 import ProductCard from '../components/ProductCard';
 import CartSidebar from '../components/CartSidebar'; 
-import './HomePage.css'; 
+import './HomePage.css';
 
 function HomePage() {
-  const [todosProdutos, setTodosProdutos] = useState([]); // Lista COMPLETA (Para busca)
-  const [produtosExibidos, setProdutosExibidos] = useState([]); // Lista FILTRADA (Para exibir)
-  const [carrinho, setCarrinho] = useState([]); 
-  const [erro, setErro] = useState(null);
-  const [isCartOpen, setIsCartOpen] = useState(false); 
+    const [products, setProducts] = useState([]);
+    const [cartItems, setCartItems] = useState([]); 
+    const [isCartOpen, setIsCartOpen] = useState(false); 
+    const [loading, setLoading] = useState(true); 
+    const [error, setError] = useState(null); 
+    const [searchTerm, setSearchTerm] = useState(""); // <-- Estado para a busca
+    const numeroFornecedor = "5531996809118"; 
 
-  // Calcula o número total de itens no carrinho
-  const cartItemCount = carrinho.reduce((acc, item) => acc + item.quantity, 0); 
+    useEffect(() => {
+        fetch('http://localhost/backend-php/api/get-produtos.php')
+            .then(response => {
+                if (!response.ok) { 
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const produtosComNumero = data.map(p => ({ 
+                    ...p, 
+                    preco: parseFloat(p.preco) || 0 
+                }));
+                setProducts(produtosComNumero);
+                setLoading(false); 
+            })
+            .catch(error => {
+                console.error("Erro ao buscar produtos:", error);
+                setError(error.message); 
+                setLoading(false);
+            });
+    }, []);
 
-  // 1. Lógica de Busca de Produtos (Executado na montagem)
-  useEffect(() => {
-    const fetchProdutos = async () => {
-      try {
-        const response = await fetch('http://localhost/backend-php/api/get-produtos.php');
-        
-        // Se a resposta não for JSON (erro de PHP), lança o erro.
-        if (!response.ok) {
-          throw new Error('Falha ao buscar produtos');
+    // --- FILTRAGEM DOS PRODUTOS (COM useMemo) ---
+    const filteredProducts = useMemo(() => {
+        if (!searchTerm) {
+            return products; // Retorna todos se a busca estiver vazia
         }
-        
-        const data = await response.json();
-        
-        // Garante que o preço é um número antes de salvar
-        const produtosTratados = data.map(p => ({
-            ...p,
-            preco: parseFloat(p.preco) || 0
-        }));
+        return products.filter(product => 
+            product.nome.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [products, searchTerm]); // Dependências
 
-        setTodosProdutos(produtosTratados); 
-        setProdutosExibidos(produtosTratados);
-      } catch (err) {
-        setErro('Erro ao buscar produtos: ' + err.message);
-      }
+
+    // --- LÓGICA DO CARRINHO (PREENCHIDA) ---
+
+    // Lógica de Adicionar ao Carrinho (com quantidade)
+    const handleAddToCart = (event, product) => {
+        event.stopPropagation(); 
+        event.preventDefault();
+
+        setCartItems(prevItems => {
+            const existingItem = prevItems.find(item => item.id === product.id);
+
+            if (existingItem) {
+                toast.info(`Mais um ${product.nome} adicionado!`); 
+                return prevItems.map(item =>
+                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                );
+            } else {
+                toast.success(`"${product.nome}" adicionado ao carrinho!`); 
+                return [...prevItems, { ...product, quantity: 1 }];
+            }
+        });
+        
+        setIsCartOpen(true);
     };
-    fetchProdutos();
-  }, []); 
-
-
-  // 2. Lógica de Busca (Recebe o termo do Header)
-  const handleSearch = (searchTerm) => {
-    const termo = searchTerm.toLowerCase();
     
-    if (termo === '') {
-      setProdutosExibidos(todosProdutos);
-      return;
-    }
+    // Funções de Gerenciar o Carrinho
+    const handleRemoveItem = (productId) => {
+        setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+        toast.error('Produto removido.');
+    };
 
-    // Filtra a lista COMPLETA
-    const resultados = todosProdutos.filter(produto => 
-      produto.nome.toLowerCase().includes(termo) ||
-      produto.descricao.toLowerCase().includes(termo)
-    );
-
-    setProdutosExibidos(resultados);
-  };
-
-
-  // 3. Lógica de Adicionar ao Carrinho (Para ProductCard)
-  const handleAddToCart = (product) => {
-    setCarrinho(prevCart => {
-        const itemExistente = prevCart.find(item => item.id === product.id);
-
-        if (itemExistente) {
-            return prevCart.map(item =>
-                item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-            );
-        } else {
-            // Garante que o preço seja tratado como float antes de adicionar
-            const precoFloat = parseFloat(product.preco) || 0;
-            return [...prevCart, { ...product, quantity: 1, preco: precoFloat }];
+    const handleUpdateQuantity = (productId, newQuantity) => {
+        if (newQuantity <= 0) {
+            handleRemoveItem(productId);
+            return;
         }
-    });
-    setIsCartOpen(true); // Abre o sidebar ao adicionar
-  };
+        setCartItems(prevItems =>
+            prevItems.map(item =>
+                item.id === productId ? { ...item, quantity: newQuantity } : item
+            )
+        );
+    };
 
-  // Funções de manipulação do CartSidebar
-  const handleRemoveItem = (id) => {
-    setCarrinho(prevCart => prevCart.filter(item => item.id !== id));
-  };
+    // Lógica do WhatsApp
+    const generateWhatsAppLink = () => {
+        if (cartItems.length === 0) {
+            toast.error("Seu carrinho está vazio!");
+            return;
+        }
 
-  const handleUpdateQuantity = (id, newQuantity) => {
-    if (newQuantity <= 0) {
-        handleRemoveItem(id);
-        return;
-    }
-    setCarrinho(prevCart => prevCart.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-  
-  const handleCheckout = () => {
-    // Lógica completa para WhatsApp
-    if (carrinho.length === 0) return;
-    const itensMsg = carrinho.map(item => 
-        `${item.quantity}x ${item.nome} (R$ ${(item.preco * item.quantity).toFixed(2)})`
-    ).join('\n');
-    const total = carrinho.reduce((acc, item) => acc + item.preco * item.quantity, 0);
-    const mensagem = `Olá! Gostaria de fazer o seguinte pedido:\n\n${itensMsg}\n\nTotal do Pedido: R$ ${total.toFixed(2)}\n\nAguardo o pagamento e a confirmação.`;
-    const numeroWhatsApp = "5500000000000"; 
-    const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(mensagem)}`;
-    window.open(url, '_blank');
-  };
+        let mensagem = "Olá! Gostaria de fazer um pedido com os seguintes itens:\n\n";
+        let total = 0;
 
+        cartItems.forEach(item => {
+            const precoItem = parseFloat(item.preco) || 0;
+            const quantidadeItem = parseInt(item.quantity) || 1;
 
-  // 4. Lógica de Agrupamento por Categoria (para carrosséis/seções)
-  const groupProdutosByCategoria = (produtos) => {
-    return produtos.reduce((grupos, produto) => {
-      // Usa o nome retornado pelo PHP
-      const categoria = produto.categoria_nome || 'Sem Categoria'; 
-      if (!grupos[categoria]) {
-        grupos[categoria] = [];
-      }
-      grupos[categoria].push(produto);
-      return grupos;
-    }, {});
-  };
+            mensagem += `- ${quantidadeItem}x ${item.nome} (R$ ${precoItem.toFixed(2)} cada)\n`;
+            total += precoItem * quantidadeItem;
+        });
 
-  const produtosAgrupados = groupProdutosByCategoria(produtosExibidos);
-  const categoriasKeys = Object.keys(produtosAgrupados);
+        mensagem += `\n*Total: R$ ${total.toFixed(2)}*`;
+
+        const link = `https://wa.me/${numeroFornecedor}?text=${encodeURIComponent(mensagem)}`;
+        window.open(link, '_blank');
+    };
+
+    // --- FIM DA LÓGICA DO CARRINHO ---
 
 
-  return (
-    <div className="homepage">
-      {/* Header */}
-      <Header 
-        onSearch={handleSearch} 
-        cartItemCount={cartItemCount}
-        onCartClick={() => setIsCartOpen(true)}
-      /> 
-      
-      <HeroBanner />
-
-      <main className="container">
-        <h2>Catálogo de Produtos</h2>
+    // Função de renderização (ATUALIZADA PARA USAR A BUSCA)
+    const renderContent = () => {
+        if (loading) { return <p>Carregando produtos...</p>; }
+        if (error) { return <p>Erro ao carregar produtos: {error}</p>; }
         
-        {/* Exibição de Erro */}
-        {erro && <p style={{color: 'red'}}>{erro}</p>}
+        // Usa a lista FILTRADA
+        if (filteredProducts.length === 0) { 
+            if (searchTerm) {
+                return <p>Nenhum produto encontrado para "{searchTerm}".</p>;
+            }
+            return <p>Nenhum produto encontrado.</p>; 
+        }
 
-        {/* Renderiza as seções por Categoria */}
-        {categoriasKeys.length > 0 ? (
-          categoriasKeys.map(categoriaNome => (
-            <div key={categoriaNome} className="category-section">
-              <h3>{categoriaNome}</h3>
-                <div className="product-grid">
-                  {produtosAgrupados[categoriaNome].map(produto => (
-                    <ProductCard 
-                      key={produto.id} 
-                      product={produto} 
-                      onAddToCart={handleAddToCart}
-                    />
-                  ))}
+        // Mapeia a lista FILTRADA
+        return filteredProducts.map(product => (
+            <Link to={`/produto/${product.id}`} key={product.id} className="product-link-wrapper">
+                <ProductCard 
+                    product={product} 
+                    onAddToCart={(e) => handleAddToCart(e, product)} 
+                />
+            </Link>
+        ));
+    };
+
+    return (
+        <>
+            {/* --- CORREÇÃO DA BUSCA --- */}
+            <Header 
+                cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)} 
+                onOpenCart={() => setIsCartOpen(true)}
+                onSearch={setSearchTerm} // <-- Passa a função de busca
+            />
+            
+            <HeroBanner />
+            <div className="container">
+                <div className="page-header">
+                    <h2 className="page-title">Nossos Produtos</h2>
                 </div>
+                <main className="product-grid">
+                    {renderContent()}
+                </main>
             </div>
-          ))
-        ) : (
-          !erro && <p>Nenhum produto cadastrado.</p>
-        )}
-      </main>
-
-      {/* Sidebar do Carrinho */}
-      <CartSidebar 
-        cartItems={carrinho}
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        onRemove={handleRemoveItem}
-        onUpdateQuantity={handleUpdateQuantity}
-        onCheckout={handleCheckout}
-      />
-    </div>
-  );
+            
+            <CartSidebar
+                cartItems={cartItems}
+                isOpen={isCartOpen}
+                onClose={() => setIsCartOpen(false)}
+                onRemove={handleRemoveItem}
+                onUpdateQuantity={handleUpdateQuantity}
+                onCheckout={generateWhatsAppLink} 
+            />
+            <ToastContainer 
+                position="top-right" 
+                autoClose={2000} 
+                hideProgressBar={false} 
+                newestOnTop={false} 
+                closeOnClick 
+            />
+        </>
+    );
 }
 
 export default HomePage;
