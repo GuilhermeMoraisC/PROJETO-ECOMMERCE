@@ -58,7 +58,7 @@ function AdminDashboard() {
   // FUNÇÃO DE BUSCA DE CATEGORIAS (NOVA)
   const fetchCategorias = async () => {
     try {
-      const response = await apiFetch('http://localhost/backend-php/api/get-categorias.php');
+      const response = await apiFetch('http://localhost/backend-php/api/admin/get-categorias.php');
       const data = await response.json();
       setCategorias(data);
       // Define a primeira categoria como padrão
