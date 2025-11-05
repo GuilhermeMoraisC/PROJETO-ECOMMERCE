@@ -296,10 +296,13 @@ function AdminDashboard() {
               required 
             />
           </div>
+          
+          {/* ***** ESTA É A LINHA QUE MUDOU ***** */}
           <p className="instructions">
-            O arquivo CSV deve ter 4 colunas: 
-            <code>nome</code>, <code>descricao</code>, <code>preco</code>, <code>imagem_path</code>
+            O arquivo CSV deve ter 5 colunas: 
+            <code>nome</code>, <code>descricao</code>, <code>preco</code>, <code>categoria_nome</code>, <code>imagem_path</code>
           </p>
+          
           <button type="submit" className="btn-submit">Importar CSV</button>
         </form>
         {mensagemCsv && <p className="feedback-message">{mensagemCsv}</p>}
