@@ -33,14 +33,15 @@
 
 // export default App;
 
-// Arquivo: src/App.js (ATUALIZADO PARA GERENCIAR O CARRINHO)
-import React, { useState } from 'react';
+// Arquivo: src/App.js (ATUALIZADO PARA GERENCIAR CARRINHO E CATEGORIAS)
+import React, { useState } from 'react'; // 1. Garanta que 'useState' está importado
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Componentes Globais
 import Header from './components/Header';
+import CategoryMenu from './components/CategoryMenu'; // <-- NOVO
 import CartSidebar from './components/CartSidebar';
 
 // Páginas
@@ -49,6 +50,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ResetPasswordPage from './pages/ResetPasswordPage'; // Rota de reset
 
 function App() {
   // --- O ESTADO DO CARRINHO AGORA MORA AQUI ---
@@ -140,6 +142,9 @@ function App() {
   // --- O ESTADO DA BUSCA TAMBÉM FICA AQUI ---
   const [searchTerm, setSearchTerm] = useState("");
 
+  // --- NOVO ESTADO PARA CATEGORIA ---
+  const [selectedCategory, setSelectedCategory] = useState(null); // null = "Todos"
+
   return (
     <BrowserRouter>
       {/* O Header agora é global e controla a busca */}
@@ -149,11 +154,23 @@ function App() {
         onSearch={setSearchTerm}
       />
 
+      {/* RENDERIZA O NOVO MENU ABAIXO DO HEADER */}
+      <CategoryMenu 
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory} // Passa a função para atualizar o estado
+      />
+
       <Routes>
         {/* Passamos o searchTerm e a função de adicionar para a HomePage */}
         <Route
           path="/"
-          element={<HomePage searchTerm={searchTerm} handleAddToCart={handleAddToCart} />}
+          element={
+            <HomePage 
+              searchTerm={searchTerm} 
+              selectedCategory={selectedCategory} // <-- Passe o estado aqui
+              handleAddToCart={handleAddToCart} 
+            />
+          }
         />
         
         {/* Passamos a função de adicionar para a ProductDetailPage */}
@@ -164,6 +181,7 @@ function App() {
 
         {/* Rotas de Admin (não precisam do carrinho) */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} /> 
         <Route
           path="/admin"
           element={

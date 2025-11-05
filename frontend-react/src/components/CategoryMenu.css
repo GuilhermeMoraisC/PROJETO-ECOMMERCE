@@ -1,0 +1,42 @@
+/* Arquivo: src/components/CategoryMenu.css (NOVO) */
+
+.category-menu {
+  background-color: var(--branco); /* Fundo branco */
+  border-bottom: 1px solid var(--borda-suave); /* Linha sutil abaixo */
+  padding: 10px 0;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.category-content {
+  display: flex;
+  justify-content: center; /* Centraliza os botões */
+  align-items: center;
+  flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+  gap: 10px; /* Espaço entre os botões */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.category-button {
+  background-color: #f0f0f0;
+  border: 1px solid transparent;
+  border-radius: 20px; /* Bordas arredondadas */
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texto-claro);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.category-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Botão de categoria ativa */
+.category-button.active {
+  background-color: var(--cor-primaria); /* Laranja */
+  color: var(--branco); /* Branco */
+  border-color: var(--cor-primaria);
+}

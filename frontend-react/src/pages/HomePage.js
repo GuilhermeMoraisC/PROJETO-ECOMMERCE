@@ -186,7 +186,7 @@
 
 // export default HomePage;
 
-// Arquivo: src/pages/HomePage.js (VERSÃO SIMPLIFICADA)
+// Arquivo: src/pages/HomePage.js (VERSÃO SIMPLIFICADA E ATUALIZADA)
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 // import { ToastContainer, toast } from 'react-toastify'; // <-- REMOVIDO (agora é global)
@@ -198,8 +198,8 @@ import ProductCard from '../components/ProductCard';
 // import CartSidebar from '../components/CartSidebar'; // <-- REMOVIDO (agora é global)
 import './HomePage.css';
 
-// Recebe 'searchTerm' e 'handleAddToCart' (global) do App.js
-function HomePage({ searchTerm, handleAddToCart }) { 
+// Recebe 'searchTerm', 'selectedCategory' e 'handleAddToCart' (global) do App.js
+function HomePage({ searchTerm, selectedCategory, handleAddToCart }) { 
     const [products, setProducts] = useState([]);
     // const [cartItems, setCartItems] = useState([]); // <-- REMOVIDO
     // const [isCartOpen, setIsCartOpen] = useState(false); // <-- REMOVIDO
@@ -232,15 +232,27 @@ function HomePage({ searchTerm, handleAddToCart }) {
     }, []);
 
     // --- FILTRAGEM DOS PRODUTOS (COM useMemo) ---
-    // Agora usa o 'searchTerm' recebido via props
+    // Agora usa o 'searchTerm' e 'selectedCategory' recebidos via props
     const filteredProducts = useMemo(() => {
-        if (!searchTerm) {
-            return products;
+        let tempProducts = products;
+
+        // 1. Filtra pela busca
+        if (searchTerm) {
+            tempProducts = tempProducts.filter(product => 
+                product.nome.toLowerCase().includes(searchTerm.toLowerCase())
+            );
         }
-        return products.filter(product => 
-            product.nome.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [products, searchTerm]); // Dependências
+
+        // 2. Filtra pela categoria (se uma estiver selecionada)
+        if (selectedCategory) { // Se for null (Todos), não aplica este filtro
+            tempProducts = tempProducts.filter(product => 
+                product.categoria_id == selectedCategory
+            );
+        }
+
+        return tempProducts;
+
+    }, [products, searchTerm, selectedCategory]); // Dependências atualizadas
 
 
     // --- LÓGICA DO CARRINHO ---
@@ -253,12 +265,15 @@ function HomePage({ searchTerm, handleAddToCart }) {
         handleAddToCart(product); // Chama a função global recebida por props
     };
 
-    // Função de renderização (igual a antes)
+    // Função de renderização (ATUALIZADA)
     const renderContent = () => {
         if (loading) { return <p>Carregando produtos...</p>; }
         if (error) { return <p>Erro ao carregar produtos: {error}</p>; }
         
         if (filteredProducts.length === 0) { 
+            if (selectedCategory && !searchTerm) { // Mensagem específica
+                return <p>Nenhum produto encontrado nesta categoria.</p>;
+            }
             if (searchTerm) {
                 return <p>Nenhum produto encontrado para "{searchTerm}".</p>;
             }
