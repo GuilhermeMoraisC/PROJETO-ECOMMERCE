@@ -42,13 +42,13 @@ function HeroBanner() {
 
         {/* Lado direito: carrossel */}
         <div className="hero-image-container">
-          <Slider {...settings}>
+          {/* <Slider {...settings}>
             {imagens.map((img, index) => (
               <div key={index} className="carousel-slide">
                 <img src={img} alt={`Produto ${index + 1}`} className="carousel-image" />
               </div>
             ))}
-          </Slider>
+          </Slider> */}
         </div>
       </div>
     </div>

@@ -9,7 +9,8 @@ function Header({ onSearch, cartItemCount, onCartClick }) {
   return (
     <header className="app-header">
       <div className="container header-content">
-        <h1 className="logo">4all</h1>
+        <img className="logo-imagem"src='logo.png'></img>
+        {/* <h1 className="logo">4ALL</h1> */}
         
         {/* Campo de Busca (do passo anterior) */}
         <div className="search-bar">
