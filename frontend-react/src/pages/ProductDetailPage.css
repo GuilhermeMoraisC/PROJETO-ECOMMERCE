@@ -135,7 +135,68 @@
 .add-to-cart-btn-large:hover {
   background-color: #e65c00;
 }
+@media (max-width: 992px) {
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+/* --- Estilos dos Breadcrumbs --- */
+.breadcrumbs {
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  color: #555;
+}
 
+.breadcrumbs a {
+  color: var(--cor-primaria);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs span {
+  margin: 0 8px;
+}
+
+.breadcrumbs .breadcrumb-category {
+  /* Categoria clicável (se você quiser implementar futuramente) */
+  /* color: var(--cor-primaria); */
+  /* cursor: pointer; */
+}
+
+.breadcrumbs .breadcrumb-active {
+  color: #888;
+  font-weight: bold;
+}
+
+/* --- Estilos dos Produtos Relacionados --- */
+.related-products-container {
+  margin-top: 50px;
+  padding-top: 30px;
+  border-top: 1px solid var(--borda-suave);
+}
+
+.related-title {
+  font-size: 1.8rem;
+  color: var(--texto-escuro);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Usamos o .product-grid da HomePage.css, 
+  mas sobrescrevemos para 4 colunas em desktop.
+*/
+.related-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px; /* Um pouco menor que o grid principal */
+}
+@media (max-width: 576px) {
+  .related-grid {
+    grid-template-columns: 1fr;
+  }
+}
 /* --- Responsividade --- */
 @media (max-width: 768px) {
   .product-content {

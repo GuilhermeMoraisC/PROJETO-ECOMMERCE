@@ -1,22 +1,22 @@
 <?php
-// Arquivo: backend-php/api/admin/upload-produto.php
+// Arquivo: backend-php/api/admin/upload-produto.php (CORRIGIDO)
 require_once '../../db_config.php';
 
-// --- (Lógica de verificação de login do admin virá aqui) ---
-
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    http_response_code(401); // Não autorizado
-    die(json_encode(['success' => false, 'message' => 'Acesso não autorizado. Faça login primeiro.']));
+    http_response_code(401); 
+    die(json_encode(['success' => false, 'message' => 'Acesso não autorizado.']));
 }
 
 $nome = $_POST['nome'] ?? '';
 $descricao = $_POST['descricao'] ?? '';
 $preco = $_POST['preco'] ?? 0;
+$categoria_id = $_POST['categoria_id'] ?? null; // <-- RECEBE A CATEGORIA
 $imagem = $_FILES['imagem'] ?? null;
 
 $response = ['success' => false, 'message' => 'Erro: Dados incompletos ou inválidos.'];
 
-if ($nome && $preco > 0 && $imagem && $imagem['error'] == 0) {
+// Adiciona $categoria_id à verificação
+if ($nome && $preco > 0 && $categoria_id && $imagem && $imagem['error'] == 0) {
     $uploadDir = '../../uploads/';
     $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     $imageFileType = strtolower(pathinfo($imagem["name"], PATHINFO_EXTENSION));
@@ -26,8 +26,10 @@ if ($nome && $preco > 0 && $imagem && $imagem['error'] == 0) {
         $uploadFile = $uploadDir . $imageFileName;
 
         if (move_uploaded_file($imagem['tmp_name'], $uploadFile)) {
-            $stmt = $conn->prepare("INSERT INTO produtos (nome, descricao, preco, imagem_path) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssds", $nome, $descricao, $preco, $imageFileName);
+            // ATUALIZA O SQL para incluir categoria_id
+            $stmt = $conn->prepare("INSERT INTO produtos (nome, descricao, preco, imagem_path, categoria_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssdsi", $nome, $descricao, $preco, $imageFileName, $categoria_id);
+            
             if ($stmt->execute()) {
                 $response = ['success' => true, 'message' => 'Produto cadastrado com sucesso!'];
             } else {
