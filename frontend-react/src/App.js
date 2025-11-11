@@ -1,39 +1,3 @@
-// // Arquivo: src/App.js (VERSÃO ATUALIZADA)
-// import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// import HomePage from './pages/HomePage';
-// import AdminDashboard from './pages/AdminDashboard';
-// import LoginPage from './pages/LoginPage'; // <--- IMPORTE A PÁGINA DE LOGIN
-// import ProtectedRoute from './components/ProtectedRoute'; // <--- IMPORTE O "GUARDA"
-// import ProductDetailPage from './pages/ProductDetailPage';
-
-// function App() {
-//   return (
-//     <BrowserRouter>
-//       <Routes>
-//         {/* Rota para a Página Principal (Pública) */}
-//         <Route path="/" element={<HomePage />} />
-
-//         {/* Rota de Login (Pública) */}
-//         <Route path="/login" element={<LoginPage />} />
-//         <Route path="/produto/:id" element={<ProductDetailPage />} />
-        
-//         {/* Rota para o Painel do Administrador (Agora Protegida) */}
-//         <Route 
-//           path="/admin" 
-//           element={
-//             <ProtectedRoute>
-//               <AdminDashboard />
-//             </ProtectedRoute>
-//           } 
-//         />
-//       </Routes>
-//     </BrowserRouter>
-//   );
-// }
-
-// export default App;
-
-// Arquivo: src/App.js (ATUALIZADO PARA GERENCIAR CARRINHO E CATEGORIAS)
 import React, { useState } from 'react'; // 1. Garanta que 'useState' está importado
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -51,6 +15,7 @@ import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ResetPasswordPage from './pages/ResetPasswordPage'; // Rota de reset
+import Footer from './components/Footer';
 
 function App() {
   // --- O ESTADO DO CARRINHO AGORA MORA AQUI ---
@@ -58,27 +23,7 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const numeroFornecedor = "5531996809118"; // Pode manter aqui ou na Home
 
-  // --- FUNÇÕES GLOBAIS DO CARRINHO ---
 
-  // Função Pura de Adicionar (sem evento)
-  // const handleAddToCart = (product) => {
-  //   setCartItems(prevItems => {
-  //     const existingItem = prevItems.find(item => item.id === product.id);
-
-  //     if (existingItem) {
-  //       toast.info(`Mais um ${product.nome} adicionado!`);
-  //       return prevItems.map(item =>
-  //         item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-  //       );
-  //     } else {
-  //       toast.success(`"${product.nome}" adicionado ao carrinho!`);
-  //       return [...prevItems, { ...product, quantity: 1 }];
-  //     }
-  //   });
-  //   setIsCartOpen(true);
-  // };
-  // Arquivo: src/App.js (Substitua a função handleAddToCart)
-// ... (resto do seu código do App.js)
 
   // --- FUNÇÕES GLOBAIS DO CARRINHO ---
 
@@ -148,9 +93,10 @@ function App() {
   return (
     <BrowserRouter>
       {/* O Header agora é global e controla a busca */}
+   {/* O Header agora é global e controla a busca */}
       <Header
         cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
-        onOpenCart={() => setIsCartOpen(true)}
+        onCartClick={() => setIsCartOpen(true)} // <--- ALTERE AQUI (de onOpenCart para onCartClick)
         onSearch={setSearchTerm}
       />
 
@@ -159,7 +105,6 @@ function App() {
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory} // Passa a função para atualizar o estado
       />
-
       <Routes>
         {/* Passamos o searchTerm e a função de adicionar para a HomePage */}
         <Route
@@ -208,6 +153,7 @@ function App() {
         newestOnTop={false}
         closeOnClick
       />
+      <Footer />
     </BrowserRouter>
   );
 }

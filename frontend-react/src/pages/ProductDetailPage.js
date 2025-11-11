@@ -135,9 +135,7 @@ function ProductDetailPage({ handleAddToCart }) {
             <h1 className="product-title">{product.nome}</h1>
             <p className="product-price-large">R$ {product.preco.toFixed(2)}</p>
             
-            <h3 className="product-section-title">Descrição</h3>
-            <p className="product-description">{product.descricao || 'Sem descrição disponível.'}</p>
-            
+           
             <h3 className="product-section-title">Quantidade</h3>
             <div className="quantity-selector">
               <button className="quantity-btn" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>-</button>
@@ -153,11 +151,13 @@ function ProductDetailPage({ handleAddToCart }) {
             </button>
           </div>
         </div>
-
+ <h3 className="product-section-title">Descrição</h3>
+            <p className="product-description">{product.descricao || 'Sem descrição disponível.'}</p>
+            
         {/* --- 2. PRODUTOS RELACIONADOS --- */}
         {relatedProducts.length > 0 && (
           <div className="related-products-container">
-            <h2 className="related-title">Quem viu, viu também</h2>
+            <h1 className="related-title">Produtos relacionados</h1>
             {/* Reutilizando o .product-grid da HomePage.css */}
             <div className="product-grid related-grid"> 
               {relatedProducts.map(related => (
