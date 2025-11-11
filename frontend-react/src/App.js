@@ -93,9 +93,10 @@ function App() {
   return (
     <BrowserRouter>
       {/* O Header agora é global e controla a busca */}
+   {/* O Header agora é global e controla a busca */}
       <Header
         cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
-        onOpenCart={() => setIsCartOpen(true)}
+        onCartClick={() => setIsCartOpen(true)} // <--- ALTERE AQUI (de onOpenCart para onCartClick)
         onSearch={setSearchTerm}
       />
 
@@ -104,7 +105,6 @@ function App() {
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory} // Passa a função para atualizar o estado
       />
-
       <Routes>
         {/* Passamos o searchTerm e a função de adicionar para a HomePage */}
         <Route
