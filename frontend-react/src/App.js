@@ -1,11 +1,11 @@
-import React, { useState } from 'react'; // 1. Garanta que 'useState' está importado
+import React, { useState, useEffect } from 'react'; // 1. Garanta que 'useEffect' está importado
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Componentes Globais
 import Header from './components/Header';
-import CategoryMenu from './components/CategoryMenu'; // <-- NOVO
+import CategoryMenu from './components/CategoryMenu';
 import CartSidebar from './components/CartSidebar';
 
 // Páginas
@@ -17,12 +17,29 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import ResetPasswordPage from './pages/ResetPasswordPage'; // Rota de reset
 import Footer from './components/Footer';
 
+// Importe o apiFetch do seu AuthContext
+import { apiFetch } from './context/AuthContext';
+
 function App() {
-  // --- O ESTADO DO CARRINHO AGORA MORA AQUI ---
+  // --- ESTADOS DO CARRINHO (EXISTENTES) ---
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const numeroFornecedor = "5531996809118"; // Pode manter aqui ou na Home
 
+  // --- NOVOS ESTADOS PARA O FRETE ---
+  const [cep, setCep] = useState('');
+  const [shippingOptions, setShippingOptions] = useState([]);
+  const [selectedShipping, setSelectedShipping] = useState(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingError, setShippingError] = useState('');
+
+  // --- NOVO: Limpa o frete se o carrinho mudar ---
+  useEffect(() => {
+    setSelectedShipping(null);
+    setShippingOptions([]);
+    setShippingError('');
+    // Não limpa o CEP, o usuário pode querer reusar
+  }, [cartItems]); // Dispara quando o carrinho muda
 
 
   // --- FUNÇÕES GLOBAIS DO CARRINHO ---
@@ -47,8 +64,6 @@ function App() {
     setIsCartOpen(true);
   };
 
-// ... (resto do seu código do App.js: handleRemoveItem, generateWhatsAppLink, return, etc.)
-
   const handleRemoveItem = (productId) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
     toast.error('Produto removido.');
@@ -66,20 +81,92 @@ function App() {
     );
   };
 
+  // --- NOVA FUNÇÃO: CALCULAR FRETE ---
+  const handleCalculateShipping = async () => {
+    // Remove qualquer formatação do CEP (deixa só números)
+    const cepLimpo = cep.replace(/\D/g, ''); 
+    
+    if (cepLimpo.length !== 8) { // CEPs no Brasil têm 8 dígitos
+      setShippingError('CEP inválido. Digite 8 números.');
+      return;
+    }
+    if (cartItems.length === 0) {
+      setShippingError('Seu carrinho está vazio.');
+      return;
+    }
+
+    setShippingLoading(true);
+    setShippingError('');
+    setShippingOptions([]);
+    setSelectedShipping(null);
+
+    try {
+      // Usamos o apiFetch do seu AuthContext (que já lida com credenciais, se necessário)
+      const response = await apiFetch('http://localhost/backend-php/api/calcular-frete.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cep: cepLimpo // Envia o CEP limpo
+          // Não precisamos enviar "items" nesta versão simplificada
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Erro ao calcular o frete.');
+      }
+
+      setShippingOptions(data.options); // Ex: [{tipo: 'PAC', ...}, {tipo: 'SEDEX', ...}]
+
+    } catch (err) {
+      setShippingError(err.message);
+    } finally {
+      setShippingLoading(false);
+    }
+  };
+
+
+  // --- ATUALIZADA: generateWhatsAppLink ---
   const generateWhatsAppLink = () => {
     if (cartItems.length === 0) {
       toast.error("Seu carrinho está vazio!");
       return;
     }
+    
+    // Validação de Frete
+    if (shippingOptions.length > 0 && !selectedShipping) {
+      toast.error("Por favor, selecione uma opção de frete.");
+      return;
+    }
+
     let mensagem = "Olá! Gostaria de fazer um pedido com os seguintes itens:\n\n";
-    let total = 0;
+    let subtotal = 0;
+
     cartItems.forEach(item => {
       const precoItem = parseFloat(item.preco) || 0;
       const quantidadeItem = parseInt(item.quantity) || 1;
       mensagem += `- ${quantidadeItem}x ${item.nome} (R$ ${precoItem.toFixed(2)} cada)\n`;
-      total += precoItem * quantidadeItem;
+      subtotal += precoItem * quantidadeItem;
     });
-    mensagem += `\n*Total: R$ ${total.toFixed(2)}*`;
+
+    mensagem += `\n*Subtotal: R$ ${subtotal.toFixed(2)}*`;
+
+    let totalGeral = subtotal;
+
+    // Adiciona o frete na mensagem
+    if (selectedShipping) {
+      mensagem += `\n*Frete (${selectedShipping.tipo}): R$ ${selectedShipping.valor.toFixed(2)}*`;
+      totalGeral += selectedShipping.valor;
+    }
+
+    mensagem += `\n\n*Total (com frete): R$ ${totalGeral.toFixed(2)}*`;
+    
+    // Adiciona o CEP se ele foi digitado
+    if(cep) {
+        mensagem += `\n\n*CEP para entrega: ${cep}*`;
+    }
+
     const link = `https://wa.me/${numeroFornecedor}?text=${encodeURIComponent(mensagem)}`;
     window.open(link, '_blank');
   };
@@ -145,6 +232,16 @@ function App() {
         onRemove={handleRemoveItem}
         onUpdateQuantity={handleUpdateQuantity}
         onCheckout={generateWhatsAppLink}
+        
+        // --- Novas Props para Frete ---
+        cep={cep}
+        setCep={setCep}
+        shippingOptions={shippingOptions}
+        selectedShipping={selectedShipping}
+        setSelectedShipping={setSelectedShipping}
+        onCalculateShipping={handleCalculateShipping}
+        shippingLoading={shippingLoading}
+        shippingError={shippingError}
       />
       <ToastContainer
         position="top-right"

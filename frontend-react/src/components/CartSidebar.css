@@ -138,3 +138,93 @@
 .checkout-btn:hover {
     background-color: #e65c00;
 }
+
+/* --- Estilos para a Seção de Frete --- */
+.cart-shipping-section {
+  padding: 10px 20px;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-shipping-section h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.cep-input-group {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.cep-input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid var(--borda-suave);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.cep-button {
+  background-color: #f0f0f0;
+  border: 1px solid var(--borda-suave);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0 10px;
+  font-weight: bold;
+}
+.cep-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shipping-error {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin: 5px 0;
+}
+
+.shipping-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.shipping-option {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.shipping-option input {
+  margin-right: 8px;
+}
+
+.shipping-option span {
+  margin-left: auto;
+  color: var(--texto-claro);
+  font-size: 0.85rem;
+}
+
+/* Ajustes no Footer do Carrinho */
+.cart-total-details {
+  font-size: 0.9rem;
+  color: var(--texto-claro);
+  margin-bottom: 10px;
+}
+.cart-total-line {
+  display: flex;
+  justify-content: space-between;
+}
+.cart-total-line strong {
+  color: var(--texto-escuro);
+}
+
+/* O total principal agora é mais destacado */
+.cart-total {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  font-size: 1.2rem; /* Aumentei o tamanho */
+}
