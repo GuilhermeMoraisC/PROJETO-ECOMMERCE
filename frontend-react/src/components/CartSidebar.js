@@ -20,7 +20,7 @@ function CartSidebar({ cartItems, isOpen, onClose, onRemove, onUpdateQuantity, o
                 onClick={(e) => e.stopPropagation()} 
             >
                 <div className="cart-header">
-                    <h3>🛒 Seu Carrinho</h3>
+                    <h3>Seu Carrinho</h3>
                     <button onClick={onClose} className="close-btn">×</button>
                 </div>
                 
